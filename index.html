@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Painel Escolar PRO TV</title>
+
+<style>
+body {
+  margin: 0;
+  display: flex;
+  height: 100vh;
+  background: black;
+  color: white;
+  font-family: 'Segoe UI';
+}
+
+/* SLIDES */
+.painel-slides {
+  width: 75%;
+  position: relative;
+}
+
+.slide {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 1s;
+}
+
+.slide.ativo {
+  opacity: 1;
+}
+
+img, video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* LATERAL */
+.painel-info {
+  width: 25%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* INFO */
+.hora { font-size: 55px; padding: 20px; }
+.data { font-size: 15px; }
+.clima { font-size: 16px; margin: 20px; }
+
+.box {
+  width: 90%;
+  text-align: center;
+  border-top: 2px solid #222;
+  padding-top: 18px;
+}
+
+.titulo { color: #00d4ff; }
+
+/* RODAPÉ */
+.marquee {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  display: flex;
+  background: black;
+  border-top: 3px solid white;
+}
+
+.tag {
+  padding: 10px 20px;
+  font-weight: bold;
+}
+
+.noticia {
+  flex: 1;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.noticia span {
+  display: inline-block;
+  padding-left: 100%;
+  animation: marquee 60s linear infinite;
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-100%); }
+}
+
+.brasil { background: green; }
+.esporte { background: orange; }
+.mundo { background: blue; }
+.tecnologia { background: gray; }
+.educacao { background: purple; }
+
+</style>
+</head>
+
+<body>
+
+<!-- SLIDES -->
+<div class="painel-slides">
+
+  <div class="slide ativo">
+    <img src="https://images.unsplash.com/photo-1588072432836-e10032774350">
+  </div>
+
+  <div class="slide">
+    <video src="./img/escola-11.mp4" muted loop preload="metadata"></video>
+  </div>
+
+  <div class="slide">
+    <video src="./img/escola-2.mp4" muted loop preload="metadata"></video>
+  </div>
+
+  <div class="slide">
+    <video src="./img/escola-3.mp4" muted loop preload="metadata"></video>
+  </div>
+
+  <div class="slide">
+    <video src="./img/escola-4.mp4" muted loop preload="metadata"></video>
+  </div>
+
+  <div class="slide">
+    <video src="./img/escola-5.mp4" muted loop preload="metadata"></video>
+  </div>
+
+  <div class="slide">
+    <video src="./img/escola-6.mp4" muted loop preload="metadata"></video>
+  </div>
+
+  <div class="slide">
+    <video src="./img/escola-7.mp4" muted loop preload="metadata"></video>
+  </div>
+
+  <div class="slide">
+    <video src="./img/escola-8.mp4" muted loop preload="metadata"></video>
+  </div>
+
+</div>
+
+<!-- INFO -->
+<div class="painel-info">
+
+  <div>
+    <div class="hora" id="hora"></div>
+    <div class="data" id="data"></div>
+    <div class="clima" id="clima">Carregando clima...</div>
+  </div>
+
+  <div class="box">
+    <div class="titulo">📚 Aula</div>
+    <div id="aula"></div>
+  </div>
+
+  <div class="box">
+    <div class="titulo">📢 Bem-vindos à Escola</div>
+    <div id="aviso"></div>
+  </div>
+
+  <div class="box">
+    <div class="titulo">🍛 Merenda</div>
+    <div id="merenda"></div>
+  </div>
+
+  <div class="box">
+    <div class="titulo">📅 RUNIÃO!</div>
+    <div id="reuniao"></div>
+  </div>
+
+</div>
+
+<!-- RODAPÉ -->
+<div class="marquee">
+  <div class="tag" id="categoria">BRASIL</div>
+  <div class="noticia">
+    <span id="noticias">Carregando notícias...</span>
+  </div>
+</div>
+
+<script>
+
+// RELÓGIO
+function atualizarHora(){
+  let d = new Date();
+  document.getElementById("hora").innerText = d.toLocaleTimeString();
+  document.getElementById("data").innerText = d.toLocaleDateString();
+}
+setInterval(atualizarHora,1000);
+atualizarHora();
+
+
+// CLIMA
+async function carregarClima(){
+  const apiKey = "47a6dfdfc0d5a23e6d498e136e95d7ab";
+
+  try{
+    const resposta = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=Manaus,BR&appid=${apiKey}&units=metric&lang=pt_br`);
+    const dados = await resposta.json();
+
+    document.getElementById("clima").innerText =
+      `🌡️ ${Math.round(dados.main.temp)}°C - ${dados.weather[0].description}`;
+
+  }catch{
+    document.getElementById("clima").innerText = "⚠️ Clima indisponível";
+  }
+}
+carregarClima();
+setInterval(carregarClima,600000);
+
+
+// AULA AUTOMÁTICA
+function aula(){
+  let h = new Date().getHours();
+  let texto = "Sem aula";
+
+  if (h >= 7 && h < 8) texto = "Matemática";
+  else if (h < 9) texto = "Português";
+  else if (h < 10) texto = "História";
+
+  document.getElementById("aula").innerText = texto;
+}
+aula();
+
+
+// TEXTOS FIXOS
+document.getElementById("aviso").innerText = " Municipal Maria constança peixoto de paiva!";
+document.getElementById("merenda").innerText = "Arroz, feijão e frango";
+document.getElementById("reuniao").innerText = "Pais e Mestres ";
+
+
+// SLIDES PROFISSIONAL
+let slides = document.querySelectorAll('.slide');
+let index = 0;
+
+// tempo por slide
+let tempos = [
+  5000,
+  5000,
+  5000,
+  5000,
+  12000,
+  8000,
+  12000,
+  15000,
+  111000
+];
+
+function rodarSlides(){
+
+  let atual = slides[index];
+
+  let videoAtual = atual.querySelector("video");
+  if(videoAtual){
+    videoAtual.pause();
+    videoAtual.currentTime = 0;
+  }
+
+  atual.classList.remove('ativo');
+
+  index = (index + 1) % slides.length;
+
+  let proximo = slides[index];
+  proximo.classList.add('ativo');
+
+  let videoNovo = proximo.querySelector("video");
+  if(videoNovo){
+    videoNovo.play();
+  }
+
+  setTimeout(rodarSlides, tempos[index]);
+}
+
+setTimeout(rodarSlides, tempos[index]);
+
+
+// NOTÍCIAS
+let categoriaIndex=0;
+
+async function carregarNoticias(){
+
+  let categorias=["BRASIL","ESPORTE","MUNDO","TECNOLOGIA","EDUCAÇÃO"];
+  let cores=["brasil","esporte","mundo","tecnologia","educacao"];
+
+  let texto="";
+
+  try{
+    let res = await fetch("https://api.spaceflightnewsapi.net/v4/articles/");
+    let data = await res.json();
+
+    data.results.slice(0,5).forEach(n=>{
+      texto += " 📰 " + n.title + " • ";
+    });
+
+  }catch{
+    texto="📰 Educação • Escola • Aprendizado • Futuro •";
+  }
+
+  document.getElementById("noticias").innerText = texto;
+
+  let tag = document.getElementById("categoria");
+  tag.innerText = categorias[categoriaIndex];
+  tag.className = "tag " + cores[categoriaIndex];
+
+  categoriaIndex = (categoriaIndex + 1) % categorias.length;
+}
+
+carregarNoticias();
+setInterval(carregarNoticias,15000);
+
+</script>
+
+</body>
+</html>
